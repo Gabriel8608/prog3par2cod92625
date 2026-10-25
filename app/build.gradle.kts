@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp) // <-- AGREGADO: plugin de KSP
 }
 
 android {
@@ -27,8 +28,9 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        // AGP 9.4 requiere JDK 17 mínimo
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     buildFeatures {
         compose = true
@@ -57,7 +59,8 @@ dependencies {
     // Room Database
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
-    annotationProcessor("androidx.room:room-compiler:2.6.1")
+    // CAMBIO: de annotationProcessor a ksp
+    ksp(libs.room.compiler)
 
     // Coil Image Loading
     implementation(libs.coil.compose)

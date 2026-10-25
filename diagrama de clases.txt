@@ -1,0 +1,266 @@
+classDiagram
+    %% ================= DOMAIN =================
+    namespace domain {
+        class Product {
+            +Int id
+            +String title
+            +String description
+            +String category
+            +Double priceUsd
+            +Double rating
+            +Int stock
+            +String? brand
+            +String thumbnail
+        }
+        class ExchangeRates {
+            +String base
+            +Double eur
+            +Double bob
+            +String date
+        }
+        class Post {
+            +Int id
+            +Int userId
+            +String title
+            +String body
+        }
+        class FavoriteProduct {
+            +Int id
+            +String title
+            +Double priceUsd
+            +String thumbnail
+            +String note
+        }
+    }
+
+    %% ================= DATA / REMOTE / DTOs =================
+    namespace data.remote.dummyjson {
+        class ProductsResponseDto {
+            +List~ProductDto~ products
+            +Int total
+            +Int skip
+            +Int limit
+        }
+        class ProductDto {
+            +Int id
+            +String title
+            +String description
+            +String category
+            +Double price
+            +Double? discountPercentage
+            +Double? rating
+            +Int? stock
+            +String? brand
+            +String thumbnail
+            +List~String~? images
+        }
+        class DummyJsonApi {
+            <<interface>>
+            +getProducts(limit, skip) Response~ProductsResponseDto~
+            +getProductById(id) Response~ProductDto~
+            +searchProducts(query) Response~ProductsResponseDto~
+        }
+    }
+
+    namespace data.remote.frankfurter {
+        class RateDto {
+            +String date
+            +String base
+            +String quote
+            +Double rate
+        }
+        class FrankfurterApi {
+            <<interface>>
+            +getRates(base, quotes) Response~List~RateDto~~
+        }
+    }
+
+    namespace data.remote.jsonplaceholder {
+        class PostDto {
+            +Int userId
+            +Int id
+            +String title
+            +String body
+        }
+        class JsonPlaceholderApi {
+            <<interface>>
+            +getPosts() Response~List~PostDto~~
+            +getPostById(id) Response~PostDto~
+        }
+    }
+
+    namespace data.remote {
+        class RetrofitInstances {
+            <<object>>
+            +DummyJsonApi dummyJsonApi
+            +FrankfurterApi frankfurterApi
+            +JsonPlaceholderApi jsonPlaceholderApi
+        }
+    }
+
+    %% ================= DATA / LOCAL =================
+    namespace data.local {
+        class FavoriteProductEntity {
+            <<Entity favorite_products>>
+            +Int id «PK»
+            +String title
+            +Double priceUsd
+            +String thumbnail
+            +String note
+        }
+        class FavoriteProductDao {
+            <<interface>>
+            +getAllFavorites() Flow~List~FavoriteProductEntity~~
+            +insertFavorite(favorite) suspend
+            +deleteFavoriteById(id) suspend
+            +isFavoriteFlow(id) Flow~Boolean~
+            +isFavorite(id) suspend Boolean
+        }
+        class AppDatabase {
+            <<abstract>>
+            +favoriteProductDao() FavoriteProductDao
+            +getDatabase(context) AppDatabase
+        }
+    }
+
+    %% ================= DATA / REPOSITORY =================
+    namespace data.repository {
+        class CatalogRepository {
+            +getProducts() Result~List~Product~~
+            +searchProducts(query) Result~List~Product~~
+            +getProductById(id) Result~Product~
+        }
+        class CurrencyRepository {
+            +getRates() Result~ExchangeRates~
+        }
+        class PostRepository {
+            +getPosts() Result~List~Post~
+        }
+        class FavoriteRepository {
+            +Flow~List~FavoriteProduct~~ favorites
+            +addFavorite(favorite) suspend
+            +removeFavorite(id) suspend
+            +isFavorite(id) suspend Boolean
+            +isFavoriteFlow(id) Flow~Boolean~
+        }
+    }
+
+    %% ================= UI / VIEWMODEL =================
+    namespace ui.viewmodel {
+        class CatalogViewModel {
+            +StateFlow~CatalogUiState~ uiState
+            +StateFlow~String~ searchQuery
+            +loadProducts()
+            +onSearchQueryChanged(query)
+            +reintentar()
+        }
+        class ProductDetailViewModel {
+            +StateFlow~ProductDetailUiState~ uiState
+            +StateFlow~RatesUiState~ ratesState
+            +StateFlow~Boolean~ isFavorite
+            +loadProduct(productId)
+            +convertPrice()
+            +toggleFavorite(product, note)
+            +reintentar()
+        }
+        class PostsViewModel {
+            +StateFlow~PostsUiState~ uiState
+            +StateFlow~Post?~ selectedPost
+            +loadPosts()
+            +selectPost(post)
+            +reintentar()
+        }
+        class FavoritesViewModel {
+            +StateFlow~List~FavoriteProduct~~ favorites
+            +removeFavorite(id)
+        }
+    }
+
+    %% ================= UI / SCREENS =================
+    namespace ui.screens {
+        class CatalogScreen {
+            <<Composable>>
+        }
+        class ProductDetailScreen {
+            <<Composable>>
+        }
+        class PostsScreen {
+            <<Composable>>
+        }
+        class FavoritesScreen {
+            <<Composable>>
+        }
+    }
+
+    namespace ui.navigation {
+        class MainAppContainer {
+            <<Composable>>
+        }
+        class Screen {
+            <<sealed>>
+            +Catalog
+            +Favorites
+            +Posts
+            +ProductDetail
+        }
+    }
+
+    %% ================= RELACIONES =================
+    %% DTOs contenidos
+    ProductsResponseDto *-- ProductDto
+
+    %% APIs usan DTOs
+    DummyJsonApi ..> ProductsResponseDto
+    DummyJsonApi ..> ProductDto
+    FrankfurterApi ..> RateDto
+    JsonPlaceholderApi ..> PostDto
+
+    %% RetrofitInstances crea APIs
+    RetrofitInstances ..> DummyJsonApi
+    RetrofitInstances ..> FrankfurterApi
+    RetrofitInstances ..> JsonPlaceholderApi
+
+    %% Repositorios usan APIs
+    CatalogRepository --> DummyJsonApi
+    CatalogRepository ..> Product
+    CatalogRepository ..> ProductDto
+    CurrencyRepository --> FrankfurterApi
+    CurrencyRepository ..> ExchangeRates
+    CurrencyRepository ..> RateDto
+    PostRepository --> JsonPlaceholderApi
+    PostRepository ..> Post
+    PostRepository ..> PostDto
+    FavoriteRepository --> FavoriteProductDao
+    FavoriteRepository ..> FavoriteProduct
+    FavoriteRepository ..> FavoriteProductEntity
+
+    %% Room
+    FavoriteProductDao ..> FavoriteProductEntity
+    AppDatabase --> FavoriteProductDao
+    AppDatabase ..> FavoriteProductEntity
+
+    %% ViewModels usan repositorios
+    CatalogViewModel --> CatalogRepository
+    CatalogViewModel ..> Product
+    ProductDetailViewModel --> CatalogRepository
+    ProductDetailViewModel --> CurrencyRepository
+    ProductDetailViewModel --> FavoriteRepository
+    ProductDetailViewModel ..> Product
+    ProductDetailViewModel ..> ExchangeRates
+    PostsViewModel --> PostRepository
+    PostsViewModel ..> Post
+    FavoritesViewModel --> FavoriteRepository
+    FavoritesViewModel ..> FavoriteProduct
+
+    %% Screens usan ViewModels
+    CatalogScreen --> CatalogViewModel
+    ProductDetailScreen --> ProductDetailViewModel
+    PostsScreen --> PostsViewModel
+    FavoritesScreen --> FavoritesViewModel
+
+    %% Navegación
+    MainAppContainer --> Screen
+    MainAppContainer ..> CatalogScreen
+    MainAppContainer ..> ProductDetailScreen
+    MainAppContainer ..> PostsScreen
+    MainAppContainer ..> FavoritesScreen
