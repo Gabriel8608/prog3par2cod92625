@@ -178,6 +178,8 @@ Así cada API vive en su propia pantalla, las publicaciones no se mezclan con lo
 ### Qué se guarda en la base de datos
 
 Solo los **productos favoritos**: nombre del producto, una nota personal y el precio. Una tabla sencilla que se conserva aunque se cierre la app.
+
+
 Promt 3, chat gpt.
 Dame la información y campos json de las 3 apis siguientes:
 Resultado IA.
@@ -713,4 +715,52 @@ C.4 FLUJO DE DATOS (resumen)
     por el repositorio.
   - El repositorio es el único que conoce DTOs, entidades y APIs.
 
+
+Promt 4, Gemini.
+siguiendo el diagrama de clases que está en la carpeta raíz, iniciamos el proyecto y crea las 3 apis, la interfaz e intégralos. (descripción del proyecto, información e apis, criterios del documento proporcionado enviados a la IA)
+Resultado IA.
+Se han creado e integrado las **tres APIs** con **Retrofit**, la arquitectura **MVVM**, **StateFlow**, **UiState**, manejo de errores y estados de carga/reintento, sin tocar la base de datos local aún (usando un repositorio temporal en memoria para Favoritos).
+
+---
+
+### 🛠️ Estructura y Archivos Implementados
+
+#### 1. Capa Dominio (`domain/`)
+- [Product.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/domain/Product.kt): Modelo de producto para el Catálogo y Detalle.
+- [ExchangeRates.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/domain/ExchangeRates.kt): Modelo para la cotización de monedas (USD $\rightarrow$ BOB y EUR).
+- [Post.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/domain/Post.kt): Modelo para publicaciones del muro.
+- [FavoriteProduct.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/domain/FavoriteProduct.kt): Modelo para productos favoritos con nota personal.
+
+#### 2. Capa Remota y Retrofit (`data/remote/`)
+- **DummyJSON** (`data/remote/dummyjson/`):
+  - [ProductDto.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/data/remote/dummyjson/ProductDto.kt): DTOs para mapear `products`, `price`, `thumbnail`, etc.
+  - [DummyJsonApi.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/data/remote/dummyjson/DummyJsonApi.kt): Endpoints `/products`, `/products/{id}` y `/products/search`.
+- **Frankfurter** (`data/remote/frankfurter/`):
+  - [RateDto.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/data/remote/frankfurter/RateDto.kt): DTO para mapear cotizaciones de divisa.
+  - [FrankfurterApi.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/data/remote/frankfurter/FrankfurterApi.kt): Endpoint `/v2/rates?base=USD&quotes=EUR,BOB`.
+- **JSONPlaceholder** (`data/remote/jsonplaceholder/`):
+  - [PostDto.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/data/remote/jsonplaceholder/PostDto.kt): DTO para `userId`, `id`, `title`, `body`.
+  - [JsonPlaceholderApi.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/data/remote/jsonplaceholder/JsonPlaceholderApi.kt): Endpoint `/posts`.
+- **Instancias de Retrofit por `baseUrl`**:
+  - [RetrofitInstances.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/data/remote/RetrofitInstances.kt): Unifica 3 clientes de Retrofit configurados independientemente por URL base (`dummyjson.com/`, `frankfurter.dev/`, `jsonplaceholder.typicode.com/`).
+
+#### 3. Repositorios (`data/repository/`)
+- [CatalogRepository.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/data/repository/CatalogRepository.kt): Transforma `ProductDto` a `Product` y retorna `Result<List<Product>>`.
+- [CurrencyRepository.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/data/repository/CurrencyRepository.kt): Obtiene cotizaciones y calcula `ExchangeRates` retornando `Result<ExchangeRates>`.
+- [PostRepository.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/data/repository/PostRepository.kt): Mapea `PostDto` a `Post` y retorna `Result<List<Post>>`.
+- [FavoriteRepository.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/data/repository/FavoriteRepository.kt): Repositorio temporal en memoria para manejar favoritos antes de integrar Room.
+
+#### 4. ViewModels y UiStates (`ui/viewmodel/`)
+- [CatalogViewModel.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/ui/viewmodel/CatalogViewModel.kt): `CatalogUiState` (`Loading`, `Success`, `Error`), filtro por buscador y `reintentar()`.
+- [ProductDetailViewModel.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/ui/viewmodel/ProductDetailViewModel.kt): Maneja carga de detalle, conversión a BOB/EUR vía Frankfurter al presionar el botón, estado `isFavorite` y `reintentar()`.
+- [PostsViewModel.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/ui/viewmodel/PostsViewModel.kt): `PostsUiState`, selección/expansión de publicaciones y `reintentar()`.
+- [FavoritesViewModel.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/ui/viewmodel/FavoritesViewModel.kt): Controla la lista de favoritos y permite quitarlos.
+
+#### 5. Pantallas e Interfaz de Usuario (`ui/screens/` y `ui/navigation/`)
+- [CatalogScreen.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/ui/screens/CatalogScreen.kt): Lista de productos (con imagen miniatura vía Coil), buscador en tiempo real, estado de carga, tarjeta de error con botón de reintento y botón de acceso al Muro de Publicaciones.
+- [ProductDetailScreen.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/ui/screens/ProductDetailScreen.kt): Muestra imagen grande, descripción y precio en USD. Incluye el botón para **Convertir a BOB y EUR (Frankfurter API)** con fecha de cotización, y botón **Marcar como favorito** con opción de ingresar nota personal.
+- [PostsScreen.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/ui/screens/PostsScreen.kt): Muro con título **"ProductéaloTu - Publicaciones"** totalmente independiente, permitiendo ver el contenido completo de cada publicación al tocarla.
+- [FavoritesScreen.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/ui/screens/FavoritesScreen.kt): Lista los productos guardados con su nota personal y botón para quitar. Si está vacía, muestra el mensaje **"Sin elementos guardados"**.
+- [AppNavigation.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/ui/navigation/AppNavigation.kt): Configuración de `NavHost` y `NavigationBar` de Material 3 para navegar fluidamente entre las 4 pantallas.
+- [MainActivity.kt](file:///D:/tempo/prog3p2/MainActivity.kt): Integra `MainAppContainer()` al iniciar la aplicación.
 
