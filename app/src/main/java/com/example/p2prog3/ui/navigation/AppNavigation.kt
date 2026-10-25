@@ -8,12 +8,14 @@ import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
+import com.example.p2prog3.data.local.AppDatabase
 import com.example.p2prog3.data.repository.FavoriteRepository
 import com.example.p2prog3.ui.screens.CatalogScreen
 import com.example.p2prog3.ui.screens.FavoritesScreen
@@ -36,12 +38,15 @@ sealed class Screen(val route: String, val title: String) {
 @Composable
 fun MainAppContainer() {
     val navController = rememberNavController()
-    val favoriteRepository = remember { FavoriteRepository() }
+    val context = LocalContext.current
+    val favoriteRepository = remember(context) {
+        val dao = AppDatabase.getDatabase(context).favoriteProductDao()
+        FavoriteRepository(dao)
+    }
 
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
 
-    // Ocultar barra inferior en la pantalla de detalle o publicaciones si preferimos
     val showBottomBar = currentRoute in listOf(Screen.Catalog.route, Screen.Favorites.route, Screen.Posts.route)
 
     Scaffold(
@@ -120,7 +125,7 @@ fun MainAppContainer() {
             ) { backStackEntry ->
                 val productId = backStackEntry.arguments?.getInt("productId") ?: return@composable
                 val detailViewModel: ProductDetailViewModel = viewModel(
-                    factory = object : androidx.lifecycle.ViewModelProvider.Factory {
+                    factory = object : ViewModelProvider.Factory {
                         @Suppress("UNCHECKED_CAST")
                         override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
                             return ProductDetailViewModel(favoriteRepository = favoriteRepository) as T
@@ -145,7 +150,7 @@ fun MainAppContainer() {
 
             composable(Screen.Favorites.route) {
                 val favoritesViewModel: FavoritesViewModel = viewModel(
-                    factory = object : androidx.lifecycle.ViewModelProvider.Factory {
+                    factory = object : ViewModelProvider.Factory {
                         @Suppress("UNCHECKED_CAST")
                         override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
                             return FavoritesViewModel(favoriteRepository = favoriteRepository) as T

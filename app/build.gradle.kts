@@ -57,6 +57,7 @@ dependencies {
     // Room Database
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
+    annotationProcessor("androidx.room:room-compiler:2.6.1")
 
     // Coil Image Loading
     implementation(libs.coil.compose)

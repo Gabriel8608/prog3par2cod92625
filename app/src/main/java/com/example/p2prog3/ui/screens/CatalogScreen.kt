@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Article
+import androidx.compose.material.icons.automirrored.filled.Article
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
@@ -44,7 +44,7 @@ fun CatalogScreen(
                 actions = {
                     IconButton(onClick = onNavigateToPosts) {
                         Icon(
-                            imageVector = Icons.Default.Article,
+                            imageVector = Icons.AutoMirrored.Filled.Article,
                             contentDescription = "Muro de publicaciones"
                         )
                     }

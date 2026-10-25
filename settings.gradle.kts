@@ -1,12 +1,9 @@
+// Clear conflicting environment property if set
+System.clearProperty("ANDROID_PREFS_ROOT")
+
 pluginManagement {
     repositories {
-        google {
-            content {
-                includeGroupByRegex("com\\.android.*")
-                includeGroupByRegex("com\\.google.*")
-                includeGroupByRegex("androidx.*")
-            }
-        }
+        google()
         mavenCentral()
         gradlePluginPortal()
     }
@@ -24,4 +21,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "p2prog3"
 include(":app")
- 

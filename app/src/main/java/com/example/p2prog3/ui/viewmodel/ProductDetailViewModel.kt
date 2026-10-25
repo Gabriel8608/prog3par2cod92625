@@ -46,7 +46,9 @@ class ProductDetailViewModel(
 
     fun loadProduct(productId: Int) {
         currentProductId = productId
-        _isFavorite.value = favoriteRepository.isFavorite(productId)
+        viewModelScope.launch {
+            _isFavorite.value = favoriteRepository.isFavorite(productId)
+        }
         _uiState.value = ProductDetailUiState.Loading
         viewModelScope.launch {
             catalogRepository.getProductById(productId).fold(
@@ -79,19 +81,21 @@ class ProductDetailViewModel(
     }
 
     fun toggleFavorite(product: Product, note: String = "") {
-        if (_isFavorite.value) {
-            favoriteRepository.removeFavorite(product.id)
-            _isFavorite.value = false
-        } else {
-            val fav = FavoriteProduct(
-                id = product.id,
-                title = product.title,
-                priceUsd = product.priceUsd,
-                thumbnail = product.thumbnail,
-                note = note.ifBlank { "Producto favorito" }
-            )
-            favoriteRepository.addFavorite(fav)
-            _isFavorite.value = true
+        viewModelScope.launch {
+            if (_isFavorite.value) {
+                favoriteRepository.removeFavorite(product.id)
+                _isFavorite.value = false
+            } else {
+                val fav = FavoriteProduct(
+                    id = product.id,
+                    title = product.title,
+                    priceUsd = product.priceUsd,
+                    thumbnail = product.thumbnail,
+                    note = note.ifBlank { "Producto favorito" }
+                )
+                favoriteRepository.addFavorite(fav)
+                _isFavorite.value = true
+            }
         }
     }
 

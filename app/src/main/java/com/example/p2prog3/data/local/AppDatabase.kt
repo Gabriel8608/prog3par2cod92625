@@ -6,12 +6,12 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 /**
- * Base de datos principal de Room.
+ * Base de datos principal de Room con Singleton.
  */
-@Database(entities = [SampleEntity::class], version = 1, exportSchema = false)
+@Database(entities = [FavoriteProductEntity::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
 
-    abstract fun sampleDao(): SampleDao
+    abstract fun favoriteProductDao(): FavoriteProductDao
 
     companion object {
         @Volatile

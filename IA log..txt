@@ -764,3 +764,52 @@ Se han creado e integrado las **tres APIs** con **Retrofit**, la arquitectura **
 - [AppNavigation.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/ui/navigation/AppNavigation.kt): Configuración de `NavHost` y `NavigationBar` de Material 3 para navegar fluidamente entre las 4 pantallas.
 - [MainActivity.kt](file:///D:/tempo/prog3p2/MainActivity.kt): Integra `MainAppContainer()` al iniciar la aplicación.
 
+Promt 5, Gemini.
+Ahora implementa la base de datos tal como muestra el diseño de la misma (sección (b) del archivo diceno.md en la carpeta raíz), siguiendo los siguientes criterios (Diceño de base de datos y criterios del documento proporcionado enviados a la IA)
+Resultado IA:
+Se ha completado la implementación de la base de datos local con **Room** respetando el diseño definido en la sección (b):
+
+---
+
+### 🗄️ Componentes de Room Implementados
+
+#### 1. Entidad (`data/local/FavoriteProductEntity.kt`)
+[FavoriteProductEntity.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/data/local/FavoriteProductEntity.kt):
+- Tabla `@Entity(tableName = "favorite_products")`.
+- Clave primaria `id: Int` (reutiliza el ID del producto de DummyJSON para evitar duplicados, NO autogenerada).
+- Atributos: `title: String`, `priceUsd: Double`, `thumbnail: String`, `note: String = ""`.
+
+#### 2. DAO (`data/local/FavoriteProductDao.kt`)
+[FavoriteProductDao.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/data/local/FavoriteProductDao.kt):
+- `@Query("SELECT * FROM favorite_products")`: Devuelve un `Flow<List<FavoriteProductEntity>>` reactivo para observar cambios en tiempo real en la UI.
+- `@Insert(onConflict = OnConflictStrategy.REPLACE)` con `suspend`: Inserta o reemplaza un favorito.
+- `@Query("DELETE FROM favorite_products WHERE id = :id")` con `suspend`: Elimina un favorito específico por su ID.
+- `@Query("SELECT EXISTS(SELECT 1 FROM favorite_products WHERE id = :id)")`: Verifica la existencia de un favorito.
+
+#### 3. Base de Datos Singleton (`data/local/AppDatabase.kt`)
+[AppDatabase.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/data/local/AppDatabase.kt):
+- `@Database(entities = [FavoriteProductEntity::class], version = 1, exportSchema = false)`.
+- Instancia única Singleton administrada mediante `Room.databaseBuilder(context, AppDatabase::class.java, "app_database.db")`.
+
+---
+
+### 🔄 Integración con Repositorio, ViewModels y Pantallas
+
+1. **`FavoriteRepository`** ([FavoriteRepository.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/data/repository/FavoriteRepository.kt)):
+   - Conectado al `FavoriteProductDao` para mapear las entidades de Room a modelos de dominio (`FavoriteProduct`) y ejecutar las funciones `suspend`.
+
+2. **`ProductDetailViewModel`** ([ProductDetailViewModel.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/ui/viewmodel/ProductDetailViewModel.kt)):
+   - Al abrir el detalle, consulta asíncronamente si el producto ya es favorito.
+   - La función `toggleFavorite(...)` guarda o elimina el producto en Room dentro del `viewModelScope`.
+
+3. **`FavoritesViewModel`** ([FavoritesViewModel.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/ui/viewmodel/FavoritesViewModel.kt)):
+   - Expone un `StateFlow<List<FavoriteProduct>>` que observa activamente la base de datos Room.
+   - La función `removeFavorite(id)` ejecuta la consulta `@Query DELETE` en Room.
+
+4. **`FavoritesScreen`** ([FavoritesScreen.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/ui/screens/FavoritesScreen.kt)):
+   - Muestra la lista de productos favoritos con su imagen, precio y nota personal.
+   - Incluye el botón de papelera para eliminar elementos.
+   - Si no hay productos guardados, muestra el mensaje **"Sin elementos guardados"**.
+
+5. **`AppNavigation`** ([AppNavigation.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/ui/navigation/AppNavigation.kt)):
+   - Obtiene la instancia única de la base de datos Room y la inyecta al repositorio de favoritos.
