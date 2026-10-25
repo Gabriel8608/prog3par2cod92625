@@ -1,0 +1,716 @@
+IA log.
+IAs Utilizadas: Gemini, Deepseek, chat gpt.
+
+Promt 1,, Gemini.
+Renombra el proyecto a p2prog3, ya que la plantilla está conotro nombre.
+Resultado IA: 
+Se ha cambiado el nombre del proyecto y de los paquetes a **p2prog3** de manera exhaustiva en todos los archivos del proyecto.
+
+### Resumen de cambios realizados:
+
+1. **Configuración de Gradle y Proyecto Root:**
+   - [settings.gradle.kts](file:///D:/tempo/prog3p2/settings.gradle.kts): Se actualizó `rootProject.name = "p2prog3"`.
+   - [app/build.gradle.kts](file:///D:/tempo/prog3p2/app/build.gradle.kts): Se modificaron `namespace` y `applicationId` a `"com.example.p2prog3"`.
+   - [README.md](file:///D:/tempo/prog3p2/README.md): Se actualizó el título principal a `# p2prog3`.
+   - Configuración IDE ([.idea/.name](file:///D:/tempo/prog3p2/.idea/.name) y [.idea/workspace.xml](file:///D:/tempo/prog3p2/.idea/workspace.xml)): Se renombró el proyecto y el módulo a `p2prog3.app`.
+
+2. **Recursos y Manifiesto de Android:**
+   - [strings.xml](file:///D:/tempo/prog3p2/app/src/main/res/values/strings.xml): Se cambió `<string name="app_name">p2prog3</string>`.
+   - [themes.xml](file:///D:/tempo/prog3p2/app/src/main/res/values/themes.xml): Se renombró el estilo a `Theme.P2prog3`.
+   - [AndroidManifest.xml](file:///D:/tempo/prog3p2/app/src/main/AndroidManifest.xml): Se aplicó el tema `Theme.P2prog3`.
+
+3. **Código Fuente y Estructura de Paquetes (`com.example.p2prog3`):**
+   - Se migraron todas las clases e interfaces desde `com.example.hubdejuegos` a `com.example.p2prog3` en `main`, `test` y `androidTest`:
+     - [MainActivity.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/MainActivity.kt)
+     - [Theme.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/ui/theme/Theme.kt) (Se renombró el composable a `P2prog3Theme`)
+     - [Color.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/ui/theme/Color.kt)
+     - [Type.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/ui/theme/Type.kt)
+     - [HomeScreen.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/ui/screens/HomeScreen.kt)
+     - [AppDatabase.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/data/local/AppDatabase.kt)
+     - [SampleDao.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/data/local/SampleDao.kt)
+     - [SampleEntity.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/data/local/SampleEntity.kt)
+     - [ApiService.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/data/remote/ApiService.kt)
+     - [RetrofitClient.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/data/remote/RetrofitClient.kt)
+     - [SampleDto.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/data/remote/SampleDto.kt)
+     - [AppRepository.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/data/repository/AppRepository.kt)
+     - [SampleModel.kt](file:///D:/tempo/prog3p2/app/src/main/java/com/example/p2prog3/domain/SampleModel.kt)
+     - [ExampleInstrumentedTest.kt](file:///D:/tempo/prog3p2/app/src/androidTest/java/com/example/p2prog3/ExampleInstrumentedTest.kt)
+     - [ExampleUnitTest.kt](file:///D:/tempo/prog3p2/app/src/test/java/com/example/p2prog3/ExampleUnitTest.kt)
+   - Se eliminaron las carpetas antiguas del paquete anterior `com/example/hubdejuegos`.
+
+4. **Verificación:**
+   - Se ejecutó **Gradle Sync** y la compilación **`app:assembleDebug`**, confirmando que el proyecto compila correctamente sin errores.
+
+Promt 2, deepseek.
+Con los siguientes punto sy apis, dame una idea de aplicación simple que maneje todos lso puntos requeridos en el documento.
+Resultado IA.
+## Idea del proyecto: **"Mi Catálogo de Productos"**
+
+Una app Android donde el usuario explora un catálogo de productos, ve sus precios en distintas monedas, lee publicaciones relacionadas y guarda sus favoritos con notas personales. Cada una de las tres APIs cumple un papel claro dentro de la app.
+
+---
+
+### Uso de cada API
+
+**DummyJSON** → *Pantalla principal (Catálogo)*
+- Es la fuente del catálogo. De aquí salen los productos que el usuario ve: imagen, nombre, categoría, descripción y precio en dólares.
+- Alimenta la lista principal y la pantalla de detalle (con la descripción y la imagen grande).
+
+**Frankfurter** → *Pantalla de detalle (Conversión de moneda)*
+- Se usa para mostrar el precio del producto en **bolivianos (BOB)** y **euros (EUR)**.
+- El usuario toca un botón y ve cuánto cuesta el producto en esas monedas, usando el tipo de cambio del día.
+
+**JSONPlaceholder** → *Pantalla de detalle (Publicaciones/Reseñas)*
+- Se usa para mostrar una sección de "publicaciones relacionadas" debajo del producto, como si fueran reseñas o comentarios de otros usuarios (título y contenido).
+- Le da vida a la pantalla de detalle sin necesidad de un sistema real de comentarios.
+
+---
+
+### Las tres pantallas
+
+**1. Pantalla principal — Catálogo** *(usa DummyJSON)*
+- Lista de productos con imagen, nombre y precio en dólares.
+- Buscador arriba para filtrar productos por texto.
+- Al tocar un producto, se abre su detalle.
+
+**2. Pantalla de detalle — Producto** *(usa Frankfurter y JSONPlaceholder)*
+- Imagen grande, descripción y precio del producto (viene de DummyJSON).
+- Botón para ver el precio convertido a **bolivianos** y **euros** (Frankfurter).
+- Sección de publicaciones con título y contenido (JSONPlaceholder).
+- Botón **"Marcar como favorito"** que guarda el producto en la base de datos local.
+
+**3. Pantalla de favoritos — Guardados** *(usa la base de datos local)*
+- Lista de los productos marcados como favoritos, con su nota personal.
+- Botón para **quitar** un favorito.
+- Si no hay nada guardado, se muestra el mensaje **"Sin elementos guardados"**.
+
+---
+
+### Flujo del usuario
+
+1. Abre la app y ve el catálogo de productos (DummyJSON).
+2. Busca un producto escribiendo en el buscador.
+3. Entra al detalle, convierte el precio a bolivianos y euros (Frankfurter) y lee publicaciones relacionadas (JSONPlaceholder).
+4. Lo marca como favorito y le escribe una nota.
+5. Va a la pantalla de favoritos, ve todo lo guardado y puede eliminarlo.
+
+---
+
+### Qué se guarda en la base de datos
+
+Solo los **productos favoritos**: nombre del producto, una nota personal y el precio. Una tabla sencilla que crece cuando el usuario marca favoritos y se conserva aunque cierre la app.
+
+Cambio sugerido: Que la tercera api tenga su propia pantalla, para que sea como una clase de pequeño lugar para publicaciones de otros usuarios.
+Resultado IA:
+Tienes toda la razón: las publicaciones de JSONPlaceholder no tienen relación con los productos, así que forzarlas dentro del detalle sería artificial. Mejor darles su propia pantalla independiente. Aquí queda la idea reorganizada:
+
+---
+
+## Idea del proyecto: **"Mi Catálogo de Productos"**
+
+Una app Android con **cuatro pantallas**, donde cada API tiene su espacio propio y la base de datos local guarda los favoritos del usuario.
+
+---
+
+### Uso de cada API (cada una en su propia pantalla)
+
+**DummyJSON** → *Pantalla 1: Catálogo*
+- Fuente del listado de productos: imagen, nombre, categoría, descripción y precio en dólares.
+- Alimenta la lista principal y la pantalla de detalle de cada producto.
+
+**Frankfurter** → *Pantalla 2: Detalle del producto*
+- Se usa para mostrar el precio del producto en **bolivianos (BOB)** y **euros (EUR)** con el tipo de cambio del día.
+- El usuario toca un botón y ve la conversión.
+
+**JSONPlaceholder** → *Pantalla 3: Publicaciones (pantalla independiente)*
+- Una sección aparte, **sin relación con los productos**, accesible desde un menú o botón en la pantalla principal.
+- Muestra un listado de publicaciones de distintos usuarios con su título y contenido, como un pequeño "muro de publicaciones".
+- Al tocar una publicación, se puede ver su contenido completo.
+
+---
+
+### Las cuatro pantallas
+
+**1. Catálogo** *(DummyJSON)*
+- Lista de productos con imagen, nombre y precio.
+- Buscador para filtrar por texto.
+- Al tocar un producto → Detalle.
+- Botón o acceso al "Muro de publicaciones".
+
+**2. Detalle del producto** *(Frankfurter)*
+- Imagen grande, descripción y precio del producto.
+- Botón para convertir el precio a bolivianos y euros.
+- Botón **"Marcar como favorito"** (guarda en la base de datos local).
+
+**3. Publicaciones** *(JSONPlaceholder)*
+- Lista de publicaciones de distintos usuarios: título y contenido.
+- Pantalla totalmente independiente del catálogo.
+- Al tocar una publicación se ve el contenido completo (o se muestra expandido).
+
+**4. Favoritos** *(base de datos local)*
+- Lista de productos marcados como favoritos, con su nota personal.
+- Botón para **quitar** un favorito.
+- Si no hay nada guardado: mensaje **"Sin elementos guardados"**.
+
+---
+
+### Cómo se organiza la navegación
+
+- La pantalla principal es el **Catálogo**.
+- Desde el catálogo se llega al **Detalle** de un producto (tocando un producto).
+- Desde el catálogo también se llega al **Muro de publicaciones** (botón o ícono en la barra superior), que es una pantalla aparte sin vínculo con los productos.
+- Desde un menú o barra inferior se accede a **Favoritos**.
+
+Así cada API vive en su propia pantalla, las publicaciones no se mezclan con los productos y la app sigue siendo sencilla y fácil de explicar en la defensa oral.
+
+---
+
+### Flujo del usuario
+
+1. Abre la app y ve el catálogo de productos (DummyJSON).
+2. Busca un producto o entra a su detalle.
+3. En el detalle, convierte el precio a bolivianos y euros (Frankfurter) y lo marca como favorito.
+4. Desde el catálogo, entra al **Muro de publicaciones** (JSONPlaceholder) para ver publicaciones de otros usuarios, sin relación con los productos.
+5. En **Favoritos** ve lo que guardó y puede quitarlo.
+
+---
+
+### Qué se guarda en la base de datos
+
+Solo los **productos favoritos**: nombre del producto, una nota personal y el precio. Una tabla sencilla que se conserva aunque se cierre la app.
+Promt 3, chat gpt.
+Dame la información y campos json de las 3 apis siguientes:
+Resultado IA.
+# Guía práctica: DummyJSON, Frankfurter y JSONPlaceholder
+
+Las tres APIs permiten hacer solicitudes HTTPS sin una clave. DummyJSON y JSONPlaceholder entregan datos de muestra para practicar; Frankfurter ofrece tipos de cambio de referencia, que se actualizan diariamente. [Documentación de DummyJSON](https://dummyjson.com/docs/products), [Frankfurter](https://frankfurter.dev/) y [JSONPlaceholder](https://jsonplaceholder.typicode.com/)
+
+## 1. DummyJSON: productos
+
+**Endpoint:** `GET https://dummyjson.com/products`
+
+La respuesta es un objeto con `products` —una lista— y los metadatos `total`, `skip` y `limit`. La documentación muestra 30 productos por defecto. [Ejemplo y esquema oficial](https://dummyjson.com/docs/products)
+
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `id` | entero | Identificador |
+| `title`, `description`, `category` | texto | Nombre, descripción y categoría |
+| `price`, `discountPercentage`, `rating` | número decimal | Precio, descuento porcentual y valoración |
+| `stock`, `weight`, `minimumOrderQuantity` | entero | Inventario, peso y cantidad mínima |
+| `tags` | lista de textos | Etiquetas |
+| `brand`, `sku`, `availabilityStatus` | texto | Marca, código SKU y estado |
+| `dimensions` | objeto de decimales | `width`, `height`, `depth` |
+| `reviews` | lista de objetos | Valoración, comentario, fecha y datos de quien reseña |
+| `meta` | objeto | Fechas de creación y modificación, código de barras y QR |
+| `thumbnail` | texto | URL de miniatura |
+| `images` | lista de textos | URLs de imágenes |
+
+Respuesta abreviada:
+
+```json
+{
+  "products": [
+    {
+      "id": 1,
+      "title": "Essence Mascara Lash Princess",
+      "category": "beauty",
+      "price": 9.99,
+      "discountPercentage": 7.17,
+      "rating": 4.94,
+      "stock": 5,
+      "tags": ["beauty", "mascara"],
+      "thumbnail": "...",
+      "images": ["..."]
+    }
+  ],
+  "total": 194,
+  "skip": 0,
+  "limit": 30
+}
+```
+
+**Parámetros y rutas útiles**
+
+- Paginación: `?limit=10&skip=10`. `limit=0` solicita todos los productos.
+- Selección: `?select=title,price`.
+- Búsqueda: `/products/search?q=phone`.
+- Categoría: `/products/category/smartphones`.
+- Orden: `?sortBy=title&order=asc`.
+- La documentación también incluye filtros por fecha de modificación mediante `modifiedAfter` y `modifiedBefore`.
+
+Al crear, editar o borrar, las respuestas simulan la operación; los cambios no se guardan en el servidor. [Detalles de paginación, filtros y operaciones](https://dummyjson.com/docs/products)
+
+## 2. Frankfurter: tipos de cambio USD → EUR y BOB
+
+**Endpoint solicitado:** `GET https://api.frankfurter.dev/v2/rates?base=USD&quotes=EUR,BOB`
+
+En v2, `/rates` devuelve una **lista de filas**, no un objeto con un mapa `rates`. Cada fila contiene:
+
+| Campo | Tipo | Significado |
+|---|---|---|
+| `date` | texto `YYYY-MM-DD` | Fecha de la cotización |
+| `base` | texto | Moneda base, por ejemplo `USD` |
+| `quote` | texto | Moneda cotizada, por ejemplo `EUR` o `BOB` |
+| `rate` | decimal | Unidades de `quote` por cada unidad de `base` |
+
+Ejemplo de estructura documentada —los valores dependen de la fecha consultada—: [documentación oficial de Frankfurter](https://frankfurter.dev/)
+
+```json
+[
+  {"date": "2026-07-03", "base": "USD", "quote": "EUR", "rate": 0.87598},
+  {"date": "2026-07-03", "base": "USD", "quote": "BOB", "rate": 6.9}
+]
+```
+
+`BOB` es el código de moneda boliviano; revisa la respuesta real para confirmar que el endpoint devuelve ambas filas en la fecha disponible. Las cotizaciones no necesariamente corresponden al día calendario actual, porque los datos se actualizan diariamente y dependen de la publicación de las fuentes.
+
+Parámetros principales:
+
+- `base=USD`: define la moneda base.
+- `quotes=EUR,BOB`: limita las monedas objetivo.
+- `date=YYYY-MM-DD`: consulta una fecha.
+- `from=YYYY-MM-DD&to=YYYY-MM-DD`: consulta un intervalo histórico.
+- `providers=ecb`: filtra por proveedor; por defecto los valores pueden combinar fuentes.
+
+No requiere clave. No tiene un endpoint de conversión: calcula `monto × rate`. Son tasas de referencia, no cotizaciones de compraventa en tiempo real. La API documenta errores HTTP `400`, `404` y `422` con un cuerpo JSON con `status` y `message`. [Parámetros, formatos y errores](https://frankfurter.dev/)
+
+## 3. JSONPlaceholder: publicaciones
+
+**Endpoint:** `GET https://jsonplaceholder.typicode.com/posts`
+
+La respuesta es una lista de 100 publicaciones. [Guía oficial y respuesta de ejemplo](https://jsonplaceholder.typicode.com/)
+
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `userId` | entero | ID del usuario autor |
+| `id` | entero | ID de la publicación |
+| `title` | texto | Título |
+| `body` | texto | Contenido; puede incluir saltos de línea |
+
+Ejemplo real de la primera publicación:
+
+```json
+{
+  "userId": 1,
+  "id": 1,
+  "title": "sunt aut facere repellat provident occaecati excepturi optio reprehenderit",
+  "body": "quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto"
+}
+```
+
+Rutas y consultas útiles:
+
+- Una publicación: `/posts/1`
+- Filtrar por autor: `/posts?userId=1`
+- Comentarios asociados: `/posts/1/comments` o `/comments?postId=1`
+
+La guía oficial muestra filtros y rutas anidadas. Para reducir resultados al paginar, JSONPlaceholder también admite los parámetros habituales `_start` y `_limit`, por ejemplo `/posts?_start=0&_limit=10`. Las operaciones `POST`, `PUT`, `PATCH` y `DELETE` son simuladas: las respuestas aparentan aplicar el cambio, pero este no queda guardado. [Guía oficial](https://jsonplaceholder.typicode.com/)
+
+## Android con Kotlin y Retrofit
+
+Con Retrofit, crea un servicio por API porque cada una tiene un dominio base distinto. En Android, declara el permiso de Internet en el manifiesto:
+
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+```
+
+Modelos mínimos para las respuestas:
+
+```kotlin
+data class ProductPage(
+    val products: List<Product>,
+    val total: Int,
+    val skip: Int,
+    val limit: Int
+)
+
+data class Product(
+    val id: Int,
+    val title: String,
+    val description: String,
+    val category: String,
+    val price: Double,
+    val discountPercentage: Double,
+    val rating: Double,
+    val stock: Int,
+    val thumbnail: String,
+    val images: List<String>
+)
+
+data class Rate(
+    val date: String,
+    val base: String,
+    val quote: String,
+    val rate: Double
+)
+
+data class Post(
+    val userId: Int,
+    val id: Int,
+    val title: String,
+    val body: String
+)
+```
+
+Interfaces Retrofit:
+
+```kotlin
+interface DummyJsonApi {
+    @GET("products")
+    suspend fun products(
+        @Query("limit") limit: Int = 30,
+        @Query("skip") skip: Int = 0
+    ): ProductPage
+}
+
+interface FrankfurterApi {
+    @GET("v2/rates")
+    suspend fun rates(
+        @Query("base") base: String = "USD",
+        @Query("quotes") quotes: String = "EUR,BOB"
+    ): List<Rate>
+}
+
+interface JsonPlaceholderApi {
+    @GET("posts")
+    suspend fun posts(
+        @Query("_start") start: Int = 0,
+        @Query("_limit") limit: Int = 10
+    ): List<Post>
+}
+```
+
+Configura cada instancia de Retrofit con su propio `baseUrl`:
+
+- DummyJSON: `https://dummyjson.com/`
+- Frankfurter: `https://api.frankfurter.dev/`
+- JSONPlaceholder: `https://jsonplaceholder.typicode.com/`
+
+Llama a las funciones `suspend` desde una corrutina, por ejemplo en `viewModelScope.launch`. Maneja errores de red y HTTP, y considera que una respuesta válida puede traer una lista vacía. Para Frankfurter, convierte con `amount * rate`; para dinero, conserva la precisión decimal adecuada y redondea solo al presentar el resultado.
+
+**Paginación:** en DummyJSON usa el `skip` de la siguiente página (`skip + limit`) y verifica `total`; en JSONPlaceholder incrementa `_start` hasta que la API devuelva una lista vacía o una lista menor que el límite solicitado.
+
+### Fuentes oficiales
+
+- [DummyJSON: Products](https://dummyjson.com/docs/products)
+- [Frankfurter: documentación v2](https://frankfurter.dev/)
+- [JSONPlaceholder: guía y ejemplos](https://jsonplaceholder.typicode.com/)
+
+Promt4, deepseek.
+Cone sta ifnromacióna cerca ee stas 3 apis, la descripción del proyecto, y la plantilla que acavod e entregarte, dame un diagrama de clases detallado en archivo .txt que sig alos siguientes puntos:
+Resultado IA:
+(a) DISEÑO DE CLASES
+================================================================================
+
+--------------------------------------------------------------------------------
+A.1 DTOs DE LAS APIs (capa data/remote)
+--------------------------------------------------------------------------------
+
+Cada API tiene su propio DTO porque devuelve una estructura JSON distinta.
+
+--- DTO 1: DummyJSON (Productos) -----------------------------------------------
+
+La respuesta es un objeto con una lista "products" y metadatos total/skip/limit.
+Se necesitan dos DTOs.
+
+data class ProductsResponseDto(
+    @SerializedName("products") val products: List<ProductDto>,
+    @SerializedName("total")    val total: Int,
+    @SerializedName("skip")     val skip: Int,
+    @SerializedName("limit")    val limit: Int
+)
+
+data class ProductDto(
+    @SerializedName("id")                 val id: Int,
+    @SerializedName("title")              val title: String,
+    @SerializedName("description")        val description: String,
+    @SerializedName("category")           val category: String,
+    @SerializedName("price")              val price: Double,
+    @SerializedName("discountPercentage") val discountPercentage: Double,
+    @SerializedName("rating")             val rating: Double,
+    @SerializedName("stock")              val stock: Int,
+    @SerializedName("brand")              val brand: String?,
+    @SerializedName("thumbnail")          val thumbnail: String,
+    @SerializedName("images")             val images: List<String>
+)
+
+Atributos relevantes:
+  - id, title, description, category
+  - price: precio en USD
+  - discountPercentage, rating, stock, brand: datos extra que se pueden mostrar
+  - thumbnail: URL de la imagen principal
+  - images: lista de URLs de imágenes
+
+--- DTO 2: Frankfurter (Tipos de cambio) ----------------------------------------
+
+/v2/rates devuelve una LISTA de filas, no un objeto. Cada fila tiene una moneda
+cotizada. Por eso el DTO es una sola clase y la respuesta se maneja como
+List<RateDto>.
+
+data class RateDto(
+    @SerializedName("date")  val date: String,   // "YYYY-MM-DD"
+    @SerializedName("base")  val base: String,   // "USD"
+    @SerializedName("quote") val quote: String,  // "EUR" o "BOB"
+    @SerializedName("rate")  val rate: Double    // unidades de quote por 1 base
+)
+
+Respuesta esperada (lista de 2 filas):
+  [
+    { "date": "...", "base": "USD", "quote": "EUR", "rate": 0.87 },
+    { "date": "...", "base": "USD", "quote": "BOB", "rate": 6.9  }
+  ]
+
+Atributos relevantes:
+  - date:  fecha de la cotización
+  - base:  moneda base (USD)
+  - quote: moneda destino (EUR o BOB)
+  - rate:  tasa de conversión (monto * rate = resultado)
+
+--- DTO 3: JSONPlaceholder (Publicaciones) --------------------------------------
+
+La respuesta es una lista directa de publicaciones.
+
+data class PostDto(
+    @SerializedName("userId") val userId: Int,
+    @SerializedName("id")     val id: Int,
+    @SerializedName("title")  val title: String,
+    @SerializedName("body")   val body: String
+)
+
+Atributos relevantes:
+  - userId: autor
+  - id:     identificador
+  - title:  título
+  - body:   contenido (puede tener saltos de línea)
+
+--------------------------------------------------------------------------------
+A.2 MODELO DEL DOMINIO (capa domain)
+--------------------------------------------------------------------------------
+
+El modelo de dominio es lo que consume la UI. Es independiente de las APIs y de
+Room. Se usan modelos separados por pantalla.
+
+--- Modelo de producto (Catálogo y Detalle) ------------------------------------
+
+data class Product(
+    val id: Int,
+    val title: String,
+    val description: String,
+    val category: String,
+    val priceUsd: Double,
+    val rating: Double,
+    val stock: Int,
+    val brand: String?,
+    val thumbnail: String
+)
+
+--- Modelo de tipo de cambio (Detalle) -----------------------------------------
+
+Se construye a partir de List<RateDto> buscando las filas "EUR" y "BOB".
+
+data class ExchangeRates(
+    val base: String,   // "USD"
+    val eur: Double,    // tasa USD -> EUR
+    val bob: Double,    // tasa USD -> BOB
+    val date: String    // fecha de la cotización
+)
+
+--- Modelo de publicación (Pantalla de Publicaciones) --------------------------
+
+data class Post(
+    val id: Int,
+    val userId: Int,
+    val title: String,
+    val body: String
+)
+
+--- Modelo de favorito (Favoritos) ---------------------------------------------
+
+data class FavoriteProduct(
+    val id: Int,
+    val title: String,
+    val priceUsd: Double,
+    val thumbnail: String,
+    val note: String
+)
+
+Relaciones entre modelos:
+  - Un Product se puede convertir en un FavoriteProduct (al marcarlo favorito).
+  - ExchangeRates se aplica sobre Product.priceUsd para mostrar EUR y BOB.
+    No se persiste (es un dato volátil).
+  - Post es totalmente independiente de Product (no hay relación).
+
+--------------------------------------------------------------------------------
+A.3 ENTIDAD DE ROOM (capa data/local)
+--------------------------------------------------------------------------------
+
+Solo se persisten los productos favoritos. Una única entidad.
+
+@Entity(tableName = "favorite_products")
+data class FavoriteProductEntity(
+    @PrimaryKey
+    val id: Int,                 // mismo id del producto de DummyJSON
+    val title: String,
+    val priceUsd: Double,
+    val thumbnail: String,
+    val note: String = ""        // nota personal del usuario
+)
+
+Relaciones:
+  - No hay relaciones foráneas. Tabla independiente y autocontenida.
+  - El "id" coincide con el id del Product de DummyJSON, lo que permite saber
+    si un producto ya está guardado (evita duplicados).
+
+
+================================================================================
+(b) DISEÑO DE LA BASE DE DATOS
+================================================================================
+
+Motor: Room (SQLite)
+Nombre de la BD: app_database
+Versión: 1
+
+--------------------------------------------------------------------------------
+Tabla: favorite_products
+--------------------------------------------------------------------------------
+
++----------------+---------+------------------------------------------+---------+
+| Columna        | Tipo    | Descripción                              | Clave   |
++----------------+---------+------------------------------------------+---------+
+| id             | INTEGER | Id del producto (viene de DummyJSON)     | PK      |
+| title          | TEXT    | Nombre del producto                      |         |
+| priceUsd       | REAL    | Precio en USD al momento de guardar      |         |
+| thumbnail      | TEXT    | URL de la imagen principal               |         |
+| note           | TEXT    | Nota personal del usuario (puede vacía)  |         |
++----------------+---------+------------------------------------------+---------+
+
+Clave primaria: id (INTEGER, NO autogenerada; se toma del producto original).
+
+Decisiones de diseño:
+  - id no es autogenerado: se reutiliza el id del producto de DummyJSON para
+    evitar duplicados (un producto solo puede estar una vez en favoritos).
+  - priceUsd se guarda como REAL para conservar el precio histórico.
+  - note se guarda como TEXT con valor por defecto "".
+  - No se guarda la tasa de cambio: es volátil y se consulta en vivo.
+
+Operaciones previstas sobre la tabla (DAO):
+  - Obtener todos los favoritos como Flow<List<...>>  (observable en la UI)
+  - Insertar o reemplazar un favorito (OnConflictStrategy.REPLACE)
+  - Eliminar un favorito por id (@Query DELETE)
+  - Actualizar la nota de un favorito
+  - Verificar si un producto ya es favorito (por id)
+
+Estados de la pantalla de Favoritos:
+  - Lista con elementos -> se muestra el listado.
+  - Lista vacía          -> se muestra "Sin elementos guardados".
+
+
+================================================================================
+(c) CAPAS DE MVVM Y SU CONTENIDO
+================================================================================
+
+El proyecto sigue el patrón MVVM con separación en capas: data (remota + local +
+repositorio), domain (modelos) y ui (pantallas + ViewModels).
+
+--------------------------------------------------------------------------------
+C.1 CAPA DATA (data/)
+--------------------------------------------------------------------------------
+
+data/remote/dummyjson/
+  - ProductDto, ProductsResponseDto
+  - DummyJsonApi   -> @GET("products") suspend fun products(limit, skip): ProductsResponseDto
+
+data/remote/frankfurter/
+  - RateDto
+  - FrankfurterApi -> @GET("v2/rates") suspend fun rates(base, quotes): List<RateDto>
+
+data/remote/jsonplaceholder/
+  - PostDto
+  - JsonPlaceholderApi -> @GET("posts") suspend fun posts(_start, _limit): List<PostDto>
+
+data/remote/
+  - RetrofitInstances -> una instancia de Retrofit por baseUrl:
+        * DummyJSON:       https://dummyjson.com/
+        * Frankfurter:     https://api.frankfurter.dev/
+        * JSONPlaceholder: https://jsonplaceholder.typicode.com/
+
+data/local/
+  - FavoriteProductEntity  -> entidad de Room
+  - FavoriteProductDao     -> DAO con Flow y suspend
+  - AppDatabase            -> base de datos con instancia única (singleton)
+
+data/repository/
+  - CatalogRepository   -> llama a DummyJsonApi, mapea ProductDto -> Product.
+                           Devuelve Result<List<Product>>.
+  - CurrencyRepository  -> llama a FrankfurterApi, recibe List<RateDto>, busca
+                           las filas EUR y BOB y construye ExchangeRates.
+                           Devuelve Result<ExchangeRates>.
+  - PostRepository      -> llama a JsonPlaceholderApi, mapea PostDto -> Post.
+                           Devuelve Result<List<Post>>.
+  - FavoriteRepository  -> operaciones CRUD sobre Room (favoritos).
+
+Todos los repositorios devuelven Result<T> y manejan errores (red, HTTP no
+exitosa, excepciones). Aquí se hace el mapeo DTO -> modelo de dominio.
+
+--------------------------------------------------------------------------------
+C.2 CAPA DOMAIN (domain/)
+--------------------------------------------------------------------------------
+
+  - Product
+  - ExchangeRates
+  - Post
+  - FavoriteProduct
+
+Modelos puros, sin dependencias de Retrofit ni Room.
+
+--------------------------------------------------------------------------------
+C.3 CAPA UI (ui/)
+--------------------------------------------------------------------------------
+
+ui/screens/
+  - CatalogScreen        -> lista de productos + buscador + acceso a Publicaciones
+  - ProductDetailScreen  -> detalle + conversión de moneda + "Marcar favorito"
+  - PostsScreen          -> lista de publicaciones (pantalla independiente)
+  - FavoritesScreen      -> lista de favoritos + quitar + mensaje de lista vacía
+
+ui/viewmodel/
+  - CatalogViewModel
+      * UiState: Loading / Success(products) / Error(message)
+      * StateFlow<CatalogUiState>
+      * query como StateFlow + derivedStateOf para filtrar
+      * acción: reintentar()
+  - ProductDetailViewModel
+      * UiState del producto
+      * UiState de las tasas (Loading / Success(ExchangeRates) / Error)
+      * acciones: cargarTasas(), marcarFavorito()
+  - PostsViewModel
+      * UiState: Loading / Success(posts) / Error(message)
+      * acción: reintentar()
+  - FavoritesViewModel
+      * observa el Flow de favoritos de Room
+      * acción: quitarFavorito(id)
+      * expone si la lista está vacía para el mensaje "Sin elementos guardados"
+
+ui/theme/ y MainActivity -> punto de entrada y tema.
+
+--------------------------------------------------------------------------------
+C.4 FLUJO DE DATOS (resumen)
+--------------------------------------------------------------------------------
+
+  Pantalla (Compose)
+        |
+        v
+  ViewModel (UiState + StateFlow)
+        |
+        v
+  Repository (Result<T>, mapeo DTO -> dominio)
+        |
+        +--> API remota (Retrofit + DTO)
+        +--> Room (Entity + DAO)
+
+  - La UI solo observa StateFlow y llama funciones del ViewModel.
+  - El ViewModel nunca llama a Retrofit ni a Room directamente: siempre pasa
+    por el repositorio.
+  - El repositorio es el único que conoce DTOs, entidades y APIs.
+
+
